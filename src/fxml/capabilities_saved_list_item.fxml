@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="30.0" prefWidth="344.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <Button fx:id="savedDelBtn" layoutX="297.0" layoutY="2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="43.0" text="Del" />
+      <Label fx:id="savedNameLb" layoutX="6.0" layoutY="6.0" text="Name" />
+      <Button fx:id="savedEditBtn" layoutX="254.0" layoutY="2.0" mnemonicParsing="false" text="Edit" />
+   </children>
+</AnchorPane>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="640.0" prefWidth="989.0" style="-fx-background-color: #eeeeee;" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DeviceInteractController">
+   <children>
+      <ImageView fx:id="screenImv" fitWidth="360.0" pickOnBounds="true" preserveRatio="true" />
+      <Label fx:id="coordLb" mouseTransparent="true" opacity="0.8" style="-fx-background-color: #ffffff;" text="0:0" textFill="BLACK" />
+      <VBox fx:id="loadingMask" alignment="CENTER" opacity="0.5" prefHeight="640.0" prefWidth="360.0" style="-fx-background-color: #ffffff;" visible="false">
+         <children>
+            <ProgressIndicator />
+         </children>
+      </VBox>
+      <AnchorPane layoutX="370.0" layoutY="28.0" prefHeight="130.0" prefWidth="236.0" style="-fx-background-color: #ffffff; -fx-border-color: #cccccc;">
+         <children>
+            <Button fx:id="refreshBtn" layoutX="7.0" layoutY="7.0" mnemonicParsing="false" text="Refresh" />
+            <Button fx:id="backBtn" layoutX="70.0" layoutY="7.0" mnemonicParsing="false" text="Back" />
+            <Button fx:id="homeBtn" layoutX="118.0" layoutY="7.0" mnemonicParsing="false" text="Home" />
+            <Button fx:id="recentBtn" layoutX="174.0" layoutY="7.0" mnemonicParsing="false" text="Recent" />
+         </children>
+      </AnchorPane>
+      <AnchorPane layoutX="370.0" layoutY="170.0" prefHeight="130.0" prefWidth="236.0" style="-fx-background-color: #ffffff; -fx-border-color: #cccccc;" />
+      <ListView fx:id="stepLv" layoutX="616.0" layoutY="28.0" prefHeight="572.0" prefWidth="361.0" />
+      <Button layoutX="845.0" layoutY="607.0" mnemonicParsing="false" text="Save" />
+      <Button layoutX="892.0" layoutY="607.0" mnemonicParsing="false" text="Load" />
+      <Button fx:id="runBtn" layoutX="940.0" layoutY="607.0" mnemonicParsing="false" text="Run" />
+      <Label layoutX="444.0" layoutY="9.0" text="Device controls" textAlignment="CENTER" />
+      <Label layoutX="750.0" layoutY="9.0" text="Automation steps" textAlignment="CENTER" />
+   </children>
+</AnchorPane>

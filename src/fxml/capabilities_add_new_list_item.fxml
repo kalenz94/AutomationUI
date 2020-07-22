@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="30.0" prefWidth="344.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TextField fx:id="addNameTf" layoutX="3.0" layoutY="2.0" prefHeight="25.0" prefWidth="145.0" promptText="Property name" />
+      <TextField fx:id="addValueTf" layoutX="156.0" layoutY="2.0" prefHeight="25.0" prefWidth="136.0" promptText="Value" />
+      <Button fx:id="addDelBtn" layoutX="297.0" layoutY="2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="43.0" text="Del" />
+   </children>
+</AnchorPane>

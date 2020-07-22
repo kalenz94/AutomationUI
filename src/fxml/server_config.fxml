@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ServerConfigController">
+   <children>
+      <TextField layoutX="237.0" layoutY="149.0" fx:id="hostTf" />
+      <Label layoutX="202.0" layoutY="153.0" text="Host:" />
+       <TextField layoutX="237.0" layoutY="186.0" fx:id="portTf" />
+      <Label layoutX="205.0" layoutY="189.0" text="Port:" />
+      <Button layoutX="262.0" layoutY="248.0" mnemonicParsing="false" text="Start server" fx:id="startServerBtn" />
+   </children>
+</AnchorPane>
