@@ -1,5 +1,7 @@
 package core;
 
+import io.appium.java_client.android.nativekey.AndroidKey;
+
 import java.awt.*;
 import java.util.List;
 
@@ -23,6 +25,9 @@ public class TestExecutor {
     }
 
     public void execute() {
+        if (listener != null) {
+            listener.onStepExecuteStarted();
+        }
         Runnable r = () -> {
             for (TestStep step : testSteps) {
                 TestAction action = step.getAction();
@@ -59,9 +64,33 @@ public class TestExecutor {
                             notifyExecuteStepFailed(step);
                         }
                         break;
+                    case PRESS_KEY:
+                        if (value instanceof AndroidKey) {
+                            AndroidKey key = (AndroidKey) value;
+                            deviceInteractor.pressKey(key);
+                            notifyExecuteStepSucceed(step);
+                        } else {
+                            notifyExecuteStepFailed(step);
+                        }
+                    case WAIT:
+                        if (value instanceof Long) {
+                            try {
+                                Thread.sleep((Long) value);
+                                notifyExecuteStepSucceed(step);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                                notifyExecuteStepFailed(step);
+                            }
+                        } else {
+                            notifyExecuteStepFailed(step);
+                        }
+                        break;
                     default:
                         notifyExecuteStepFailed(step);
                 }
+            }
+            if (listener != null) {
+                listener.onStepExecuteFinished();
             }
         };
         executor = new Thread(r);
@@ -85,7 +114,9 @@ public class TestExecutor {
     }
 
     public interface ExecuteStateListener {
+        void onStepExecuteStarted();
         void onStepExecuted(TestStep step, boolean success);
+        void onStepExecuteFinished();
     }
 
 }

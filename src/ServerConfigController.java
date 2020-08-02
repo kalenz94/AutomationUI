@@ -1,9 +1,6 @@
 import base.BaseController;
-import javafx.application.Platform;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 import utils.PreferencesUtils;
 import utils.ServerUtils;
 
@@ -26,6 +23,7 @@ public class ServerConfigController extends BaseController {
         startServerBtn.setOnMouseClicked(event -> {
             String host = hostTf.getText();
             String port = portTf.getText();
+            BaseController controller = null;
             try {
                 Runnable r = () -> {
                     try {
@@ -38,11 +36,12 @@ public class ServerConfigController extends BaseController {
                 new Thread(r).start();
                 saveServerConfig(hostTf.getText(), portTf.getText());
                 Thread.sleep(3000L);
-                openStage("fxml/capabilities.fxml", "Capabilities");
+                controller = openStage("fxml/capabilities.fxml", "Capabilities");
                 startServerBtn.getScene().getWindow().hide();
             } catch (Exception e) {
                 showAlert(e.getMessage(), true);
                 e.printStackTrace();
+                controller.getStage().close();
             }
         });
     }

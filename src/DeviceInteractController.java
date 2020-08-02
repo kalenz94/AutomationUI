@@ -5,7 +5,6 @@ import core.TestExecutor;
 import core.TestStep;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.nativekey.AndroidKey;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -15,6 +14,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import model.Capability;
@@ -32,10 +32,17 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class DeviceInteractController extends BaseController {
+    private static final String ADD_STEP_TITLE = "Add step";
     @FXML
-    public Label coordLb;
+    private AnchorPane screenPane;
     @FXML
-    public VBox loadingMask;
+    private AnchorPane controlPane;
+    @FXML
+    private AnchorPane stepPane;
+    @FXML
+    private Label coordLb;
+    @FXML
+    private VBox loadingMask;
     @FXML
     public Button backBtn;
     @FXML
@@ -49,6 +56,10 @@ public class DeviceInteractController extends BaseController {
     @FXML
     private Button runBtn;
     @FXML
+    private Button recordBtn;
+    @FXML
+    private Button addStepBtn;
+    @FXML
     private ListView<StepRow> stepLv;
 
     private double screenImvW, screenImvH;
@@ -57,26 +68,17 @@ public class DeviceInteractController extends BaseController {
     private DeviceInteractor deviceInteractor;
     private TestExecutor testExecutor;
 
-    Point startP, endP;
-    boolean mousePressed = false;
-    boolean longPressed = false;
+    private Point startP, endP;
+    private boolean mousePressed = false;
+    private boolean longPressed = false;
+    private boolean isRecording = false;
+    private long lastActionTime;
+
+    // Flag to check if AddStepInput dialog is displaying.
+    private boolean isAddingStep = false;
+    private OnCoordsPickedListener listener;
 
     public void initialize() {
-        ObservableList<StepRow> stepList = FXCollections.observableArrayList();
-        TestStep step1 = new TestStep(TestAction.SWIPE, new Point[]{new Point(357, 1642), new Point(359, 657)});
-        TestStep step2 = new TestStep(TestAction.TAP, new Point(747, 780));
-        TestStep step3 = new TestStep(TestAction.TAP, new Point(150, 1829));
-        TestStep step4 = new TestStep(TestAction.TAP, new Point(912, 1815));
-        TestStep step5 = new TestStep(TestAction.TAP, new Point(414, 1821));
-        TestStep step6 = new TestStep(TestAction.TAP, new Point(933, 2060));
-        stepList.add(newStepRow(step1));
-        stepList.add(newStepRow(step2));
-        stepList.add(newStepRow(step3));
-        stepList.add(newStepRow(step4));
-        stepList.add(newStepRow(step5));
-        stepList.add(newStepRow(step6));
-        stepLv.setItems(stepList);
-
         screenImv.setOnMouseMoved(event -> {
             Point p = getMouseRelativePos(event.getX(), event.getY());
             coordLb.setText(p.x + ":" + p.y);
@@ -87,29 +89,36 @@ public class DeviceInteractController extends BaseController {
             }
         });
         screenImv.setOnMousePressed(event -> {
-            mousePressed = true;
-            startP = getMouseRelativePos(event.getX(), event.getY());
-            new Timer().schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    if (mousePressed) {
-                        longPressed = true;
-                        longPress(startP);
+            if (!isAddingStep) {
+                mousePressed = true;
+                startP = getMouseRelativePos(event.getX(), event.getY());
+                new Timer().schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (mousePressed) {
+                            longPressed = true;
+                            longPress(startP);
+                        }
                     }
-                }
-            }, 500L);
+                }, 1000L);
+            }
         });
         screenImv.setOnMouseReleased(event -> {
-            mousePressed = false;
-            if (!screenImv.getLayoutBounds().contains(event.getX(), event.getY()) || longPressed) {
-                longPressed = false;
-                return;
-            }
-            endP = getMouseRelativePos(event.getX(), event.getY());
-            if (startP.distance(endP) == 0) {
-                tap(endP);
-            } else {
-                swipe(startP, endP);
+            if (!isAddingStep) {
+                mousePressed = false;
+                if (!screenImv.getLayoutBounds().contains(event.getX(), event.getY()) || longPressed) {
+                    longPressed = false;
+                    return;
+                }
+                endP = getMouseRelativePos(event.getX(), event.getY());
+                if (startP.distance(endP) == 0) {
+                    tap(endP);
+                } else {
+                    swipe(startP, endP);
+                }
+            } else if (listener != null) {
+                Point pickedPoint = getMouseRelativePos(event.getX(), event.getY());
+                listener.onCoordPicked(pickedPoint.x, pickedPoint.y);
             }
         });
 
@@ -118,29 +127,81 @@ public class DeviceInteractController extends BaseController {
             waitAndRefreshScreen();
         });
         backBtn.setOnMouseClicked(event -> {
-            showLoading();
-            deviceInteractor.pressKey(AndroidKey.BACK);
-            waitAndRefreshScreen();
+            pressKey(AndroidKey.BACK);
         });
         homeBtn.setOnMouseClicked(event -> {
-            showLoading();
-            deviceInteractor.pressKey(AndroidKey.HOME);
-            waitAndRefreshScreen();
+            pressKey(AndroidKey.HOME);
         });
         recentBtn.setOnMouseClicked(event -> {
-            showLoading();
-            deviceInteractor.pressKey(AndroidKey.APP_SWITCH);
-            waitAndRefreshScreen();
+            pressKey(AndroidKey.APP_SWITCH);
         });
 
         runBtn.setOnMouseClicked(event -> {
             testExecutor = new TestExecutor(deviceInteractor);
             testExecutor.setTestSteps(getTestStepList());
-            testExecutor.setExecuteStateListener((step, succeed) -> {
-                System.out.println(step.getDescription() + " is " + (succeed ? "succeed" : "failed"));
+            testExecutor.setExecuteStateListener(new TestExecutor.ExecuteStateListener() {
+                @Override
+                public void onStepExecuteStarted() {
+                    runBtn.setDisable(true);
+                }
+
+                @Override
+                public void onStepExecuted(TestStep step, boolean success) {
+                    System.out.println(step.getDescription() + " is " + (success ? "succeed" : "failed"));
+                    refreshScreen();
+                }
+
+                @Override
+                public void onStepExecuteFinished() {
+                    runBtn.setDisable(false);
+                }
             });
             testExecutor.execute();
         });
+
+        recordBtn.setOnMouseClicked(event -> {
+            if (isRecording) {
+                isRecording = false;
+                recordBtn.setText("Start record");
+                runBtn.setDisable(false);
+            } else {
+                isRecording = true;
+                recordBtn.setText("Stop record");
+                runBtn.setDisable(true);
+            }
+            lastActionTime = 0;
+        });
+
+        addStepBtn.setOnMouseClicked(event -> {
+            toggleAddingStepMode(true);
+            AddStepInputController controller = null;
+            try {
+                controller = (AddStepInputController) openStage("fxml/add_step_input.fxml", ADD_STEP_TITLE);
+                listener = controller;
+            } catch (Exception e) {
+                e.printStackTrace();
+                controller.getStage().close();
+            }
+            controller.getStage().setAlwaysOnTop(true);
+            controller.setOnStepAddListener(new AddStepInputController.OnStepAddListener() {
+                @Override
+                public void onOK(TestStep step) {
+                    toggleAddingStepMode(false);
+                    stepLv.getItems().add(newStepRow(step));
+                }
+
+                @Override
+                public void onCancel() {
+                    toggleAddingStepMode(false);
+                }
+            });
+        });
+    }
+
+    private void toggleAddingStepMode(boolean flag) {
+        isAddingStep = flag;
+        controlPane.setDisable(flag);
+        stepPane.setDisable(flag);
     }
 
     private Point getMouseRelativePos(double mouseX, double mouseY) {
@@ -161,10 +222,6 @@ public class DeviceInteractController extends BaseController {
     }
 
     private void startSession(List<Capability> selectedCapabilities) {
-        if (selectedCapabilities.size() == 0) {
-            showAlert("Please input some capabilities!", false);
-            return;
-        }
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
         for (Capability cap : selectedCapabilities) {
             desiredCapabilities.setCapability(cap.getName(), cap.getValue());
@@ -217,6 +274,12 @@ public class DeviceInteractController extends BaseController {
         showLoading();
         deviceInteractor.tap(p);
         waitAndRefreshScreen();
+        if (isRecording) {
+            considerAddWaitStep();
+            TestStep step = new TestStep(TestAction.TAP, p);
+            stepLv.getItems().add(newStepRow(step));
+        }
+        lastActionTime = System.currentTimeMillis();
     }
 
     private void swipe(Point startP, Point endP) {
@@ -224,6 +287,12 @@ public class DeviceInteractController extends BaseController {
         showLoading();
         deviceInteractor.swipe(startP, endP);
         waitAndRefreshScreen();
+        if (isRecording) {
+            considerAddWaitStep();
+            TestStep step = new TestStep(TestAction.SWIPE, new Point[]{startP, endP});
+            stepLv.getItems().add(newStepRow(step));
+        }
+        lastActionTime = System.currentTimeMillis();
     }
 
     private void longPress(Point p) {
@@ -231,6 +300,31 @@ public class DeviceInteractController extends BaseController {
         showLoading();
         deviceInteractor.longPress(p);
         waitAndRefreshScreen();
+        if (isRecording) {
+            considerAddWaitStep();
+            TestStep step = new TestStep(TestAction.LONG_PRESS, p);
+            stepLv.getItems().add(newStepRow(step));
+        }
+        lastActionTime = System.currentTimeMillis();
+    }
+
+    private void pressKey(AndroidKey key) {
+        showLoading();
+        deviceInteractor.pressKey(key);
+        waitAndRefreshScreen();
+        if (isRecording) {
+            considerAddWaitStep();
+            TestStep step = new TestStep(TestAction.PRESS_KEY, key);
+            stepLv.getItems().add(newStepRow(step));
+        }
+        lastActionTime = System.currentTimeMillis();
+    }
+
+    private void considerAddWaitStep() {
+        if (lastActionTime != 0) {
+            TestStep waitStep = new TestStep(TestAction.WAIT, System.currentTimeMillis() - lastActionTime);
+            stepLv.getItems().add(newStepRow(waitStep));
+        }
     }
 
     private List<TestStep> getTestStepList() {
@@ -246,22 +340,44 @@ public class DeviceInteractController extends BaseController {
         StepRow stepRow = new StepRow(step);
         stepRow.setOnStepRowChangedListener(new OnStepRowChangedListener() {
             @Override
-            public void onRowEditClicked(TestStep step) {
+            public void onRowEditClicked(StepRow row) {
+                toggleAddingStepMode(true);
+                AddStepInputController controller = null;
+                try {
+                    controller = (AddStepInputController) openStage("fxml/add_step_input.fxml", ADD_STEP_TITLE, row.getTestStep());
+                    listener = controller;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    controller.getStage().close();
+                }
+                controller.getStage().setAlwaysOnTop(true);
+                controller.setOnStepAddListener(new AddStepInputController.OnStepAddListener() {
+                    @Override
+                    public void onOK(TestStep step) {
+                        row.setTestStep(step);
+                        row.reloadDescription();
+                        toggleAddingStepMode(false);
+                    }
 
+                    @Override
+                    public void onCancel() {
+                        toggleAddingStepMode(false);
+                    }
+                });
             }
 
             @Override
             public void onRowDeleted(StepRow saveRow) {
-
+                stepLv.getItems().remove(saveRow);
             }
         });
         return stepRow;
     }
 
     private static class StepRow extends HBox {
-        private Label descriptionLb;
-        private Button editBtn;
-        private Button delBtn;
+        private final Label descriptionLb;
+        private final Button editBtn;
+        private final Button delBtn;
         private TestStep step;
         OnStepRowChangedListener listener;
 
@@ -278,11 +394,11 @@ public class DeviceInteractController extends BaseController {
             editBtn = (Button) item.lookup("#editBtn");
             delBtn = (Button) item.lookup("#delBtn");
 
-            descriptionLb.setText(step.getDescription());
+            reloadDescription();
 
             editBtn.setOnMouseClicked(event -> {
                 if (listener != null) {
-                    listener.onRowEditClicked(step);
+                    listener.onRowEditClicked(StepRow.this);
                 }
             });
             delBtn.setOnMouseClicked(event -> {
@@ -293,8 +409,16 @@ public class DeviceInteractController extends BaseController {
             this.getChildren().add(item);
         }
 
+        public void reloadDescription() {
+            descriptionLb.setText(step.getDescription());
+        }
+
         public TestStep getTestStep() {
             return step;
+        }
+
+        public void setTestStep(TestStep step) {
+            this.step = step;
         }
 
         public void setOnStepRowChangedListener(OnStepRowChangedListener listener) {
@@ -304,10 +428,13 @@ public class DeviceInteractController extends BaseController {
     }
 
     private interface OnStepRowChangedListener {
+        void onRowEditClicked(StepRow row);
 
-        void onRowEditClicked(TestStep step);
+        void onRowDeleted(StepRow row);
+    }
 
-        void onRowDeleted(StepRow saveRow);
+    public interface OnCoordsPickedListener {
+        void onCoordPicked(int x, int y);
     }
 
 }

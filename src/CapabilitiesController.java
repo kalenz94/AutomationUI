@@ -54,7 +54,17 @@ public class CapabilitiesController extends BaseController {
             addCapList.getItems().add(newAddRow());
         });
         startSessionBtn.setOnMouseClicked(event -> {
-            openStage("fxml/device_interact.fxml", "Device interaction", Modality.APPLICATION_MODAL, selectedCapabilities);
+            BaseController controller = null;
+            try {
+                if (selectedCapabilities.size() == 0) {
+                    showAlert("Please input some capabilities!", false);
+                    return;
+                }
+                controller = openStage("fxml/device_interact.fxml", "Device interaction", Modality.APPLICATION_MODAL, selectedCapabilities);
+            } catch (Exception e) {
+                e.printStackTrace();
+                controller.getStage().close();
+            }
         });
         saveAsBtn.setOnMouseClicked(event -> {
             TextInputDialog dialog = new TextInputDialog();

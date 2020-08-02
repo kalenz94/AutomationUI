@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="84.0" prefWidth="602.0" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="AddStepInputController">
+   <children>
+      <Label layoutX="7.0" layoutY="17.0" text="Action:" />
+      <ChoiceBox fx:id="actionCb" layoutX="50.0" layoutY="13.0" prefHeight="25.0" prefWidth="100.0" />
+
+      <AnchorPane fx:id="tapVarPane" layoutX="155.0" prefHeight="57.0" prefWidth="447.0" visible="false">
+         <children>
+            <Label layoutX="12.0" layoutY="18.0" text="at     x:" />
+            <TextField fx:id="tapXTf" layoutX="55.0" layoutY="14.0" prefHeight="25.0" prefWidth="52.0" />
+            <Label layoutX="114.0" layoutY="18.0" text="y:" />
+            <TextField fx:id="tapYTf" layoutX="129.0" layoutY="14.0" prefHeight="25.0" prefWidth="52.0" />
+            <Button fx:id="pickTapCoordBtn" layoutX="189.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="33.0" text="⌖" />
+         </children></AnchorPane>
+
+      <AnchorPane fx:id="swipeVarPane" layoutX="155.0" prefHeight="57.0" prefWidth="447.0" visible="false">
+         <children>
+            <Label layoutX="12.0" layoutY="18.0" text="from  x:" />
+            <TextField fx:id="swipeXTf" layoutX="55.0" layoutY="14.0" prefHeight="25.0" prefWidth="52.0" />
+            <Label layoutX="114.0" layoutY="18.0" text="y:" />
+            <TextField fx:id="swipeYTf" layoutX="129.0" layoutY="14.0" prefHeight="25.0" prefWidth="52.0" />
+            <Button fx:id="pickSwipeCoordBtn1" layoutX="189.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="33.0" text="⌖" />
+            <Label layoutX="232.0" layoutY="18.0" text="to x:" />
+            <TextField fx:id="swipeXTf2" layoutX="260.0" layoutY="14.0" prefHeight="25.0" prefWidth="52.0" />
+            <Label layoutX="320.0" layoutY="18.0" text="y:" />
+            <TextField fx:id="swipeYTf2" layoutX="335.0" layoutY="14.0" prefHeight="25.0" prefWidth="52.0" />
+            <Button fx:id="pickSwipeCoordBtn2" layoutX="395.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="33.0" text="⌖" />
+         </children></AnchorPane>
+
+      <AnchorPane fx:id="longPressVarPane" layoutX="155.0" prefHeight="57.0" prefWidth="447.0" visible="false">
+         <children>
+            <Label layoutX="12.0" layoutY="18.0" text="at     x:" />
+            <TextField fx:id="longpressXTf" layoutX="55.0" layoutY="14.0" prefHeight="25.0" prefWidth="52.0" />
+            <Label layoutX="114.0" layoutY="18.0" text="y:" />
+            <TextField fx:id="longpressYTf" layoutX="129.0" layoutY="14.0" prefHeight="25.0" prefWidth="52.0" />
+            <Button fx:id="pickLongpressCoordBtn" layoutX="189.0" layoutY="14.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="33.0" text="⌖" />
+         </children>
+      </AnchorPane>
+
+      <AnchorPane fx:id="waitVarPane" layoutX="155.0" prefHeight="57.0" prefWidth="447.0" visible="false">
+         <children>
+            <Label layoutX="12.0" layoutY="18.0" text="for:" />
+            <TextField fx:id="waitTimeTf" layoutX="37.0" layoutY="14.0" prefHeight="25.0" prefWidth="73.0" />
+            <Label layoutX="120.0" layoutY="18.0" text="(milliseconds)" />
+         </children>
+      </AnchorPane>
+
+      <AnchorPane fx:id="keyPressVarPane" layoutX="155.0" prefHeight="57.0" prefWidth="447.0">
+         <children>
+            <Label layoutX="12.0" layoutY="18.0" text="key code:" />
+            <ChoiceBox fx:id="keyCodeCb" layoutX="74.0" layoutY="14.0" prefWidth="150.0" />
+         </children>
+      </AnchorPane>
+
+      <Button fx:id="okBtn" layoutX="555.0" layoutY="53.0" mnemonicParsing="false" text="OK" />
+      <Button fx:id="cancelBtn" layoutX="496.0" layoutY="53.0" mnemonicParsing="false" text="Cancel" />
+   </children>
+</AnchorPane>

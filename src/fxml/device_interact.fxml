@@ -4,29 +4,42 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane prefHeight="640.0" prefWidth="989.0" style="-fx-background-color: #eeeeee;" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DeviceInteractController">
+<AnchorPane fx:id="deviceInteractPane" prefHeight="732.0" prefWidth="986.0" style="-fx-background-color: #eeeeee;" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="DeviceInteractController">
    <children>
-      <ImageView fx:id="screenImv" fitWidth="360.0" pickOnBounds="true" preserveRatio="true" />
-      <Label fx:id="coordLb" mouseTransparent="true" opacity="0.8" style="-fx-background-color: #ffffff;" text="0:0" textFill="BLACK" />
-      <VBox fx:id="loadingMask" alignment="CENTER" opacity="0.5" prefHeight="640.0" prefWidth="360.0" style="-fx-background-color: #ffffff;" visible="false">
+      <AnchorPane fx:id="screenPane" prefHeight="732.0" prefWidth="360.0">
          <children>
-            <ProgressIndicator />
-         </children>
-      </VBox>
-      <AnchorPane layoutX="370.0" layoutY="28.0" prefHeight="130.0" prefWidth="236.0" style="-fx-background-color: #ffffff; -fx-border-color: #cccccc;">
-         <children>
-            <Button fx:id="refreshBtn" layoutX="7.0" layoutY="7.0" mnemonicParsing="false" text="Refresh" />
-            <Button fx:id="backBtn" layoutX="70.0" layoutY="7.0" mnemonicParsing="false" text="Back" />
-            <Button fx:id="homeBtn" layoutX="118.0" layoutY="7.0" mnemonicParsing="false" text="Home" />
-            <Button fx:id="recentBtn" layoutX="174.0" layoutY="7.0" mnemonicParsing="false" text="Recent" />
+            <ImageView fx:id="screenImv" fitWidth="360.0" pickOnBounds="true" preserveRatio="true" />
+            <Label fx:id="coordLb" mouseTransparent="true" opacity="0.8" style="-fx-background-color: #ffffff;" text="0:0" textFill="BLACK" />
+            <VBox fx:id="loadingMask" alignment="CENTER" opacity="0.5" prefHeight="640.0" prefWidth="360.0" style="-fx-background-color: #ffffff;" visible="false">
+               <children>
+                  <ProgressIndicator />
+               </children>
+            </VBox>
          </children>
       </AnchorPane>
-      <AnchorPane layoutX="370.0" layoutY="170.0" prefHeight="130.0" prefWidth="236.0" style="-fx-background-color: #ffffff; -fx-border-color: #cccccc;" />
-      <ListView fx:id="stepLv" layoutX="616.0" layoutY="28.0" prefHeight="572.0" prefWidth="361.0" />
-      <Button layoutX="845.0" layoutY="607.0" mnemonicParsing="false" text="Save" />
-      <Button layoutX="892.0" layoutY="607.0" mnemonicParsing="false" text="Load" />
-      <Button fx:id="runBtn" layoutX="940.0" layoutY="607.0" mnemonicParsing="false" text="Run" />
-      <Label layoutX="444.0" layoutY="9.0" text="Device controls" textAlignment="CENTER" />
-      <Label layoutX="750.0" layoutY="9.0" text="Automation steps" textAlignment="CENTER" />
+      <AnchorPane fx:id="controlPane" layoutX="369.0" layoutY="-1.0" prefHeight="732.0" prefWidth="236.0">
+         <children>
+            <AnchorPane layoutY="31.0" prefHeight="103.0" prefWidth="236.0" style="-fx-background-color: #ffffff; -fx-border-color: #cccccc;">
+               <children>
+                  <Button fx:id="refreshBtn" layoutX="7.0" layoutY="7.0" mnemonicParsing="false" text="Refresh" />
+                  <Button fx:id="backBtn" layoutX="70.0" layoutY="7.0" mnemonicParsing="false" text="Back" />
+                  <Button fx:id="homeBtn" layoutX="118.0" layoutY="7.0" mnemonicParsing="false" text="Home" />
+                  <Button fx:id="recentBtn" layoutX="174.0" layoutY="7.0" mnemonicParsing="false" text="Recent" />
+                  <Button fx:id="recordBtn" layoutX="7.0" layoutY="40.0" mnemonicParsing="false" text="Start record" />
+               </children>
+            </AnchorPane>
+            <Label layoutX="80.0" layoutY="10.0" text="Device controls" textAlignment="CENTER" />
+         </children>
+      </AnchorPane>
+      <AnchorPane fx:id="stepPane" layoutX="616.0" prefHeight="732.0" prefWidth="330.0">
+         <children>
+            <ListView fx:id="stepLv" layoutY="30.0" prefHeight="653.0" prefWidth="360.0" />
+            <Button layoutX="222.0" layoutY="695.0" mnemonicParsing="false" text="Save" />
+            <Button layoutX="270.0" layoutY="695.0" mnemonicParsing="false" text="Load" />
+            <Button fx:id="runBtn" layoutX="319.0" layoutY="695.0" mnemonicParsing="false" text="Run" />
+            <Button fx:id="addStepBtn" layoutY="693.0" mnemonicParsing="false" text="Add" />
+            <Label layoutX="138.0" layoutY="9.0" text="Automation steps" textAlignment="CENTER" />
+         </children>
+      </AnchorPane>
    </children>
 </AnchorPane>
